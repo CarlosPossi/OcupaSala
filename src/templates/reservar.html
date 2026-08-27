@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% block content %}
+<div style="max-width: 640px;">
+    <header style="margin-bottom: 40px;">
+        <h1 style="font-size: 2.25rem; font-weight: 800; letter-spacing: -0.025em;">Reservar Sala</h1>
+        <p style="color: var(--text-secondary); margin-top: 4px;">Escolha a melhor sala e horário para suas atividades.</p>
+    </header>
+    
+    <div class="auth-card" style="max-width: 100%; padding: 40px; margin: 0;">
+        <form method="POST" action="{{ url_for('views.reservar') }}">
+            <div class="form-group">
+                <label>Sala de Estudo</label>
+                <select name="sala" required>
+                    <option value="" disabled selected>Selecione um espaço...</option>
+                    {% for sala in salas %}
+                    <option value="{{ sala.nome }}">{{ sala.nome }} — até {{ sala.capacidade }} pessoas</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Dia da Reserva</label>
+                <input type="date" name="dia" required>
+            </div>
+            <div class="form-group">
+                <label>Horário de Início</label>
+                <input type="time" name="inicio" required>
+            </div>
+            <div class="form-group" style="margin-bottom: 32px;">
+                <label>Horário de Término</label>
+                <input type="time" name="fim" required>
+            </div>
+            <div style="display: flex; gap: 16px;">
+                <button type="submit" class="btn btn-primary">Confirmar Agendamento</button>
+                <a href="{{ url_for('views.dashboard') }}" class="btn btn-danger" style="background: transparent; border: 1px solid var(--border); color: var(--text-secondary); width: auto;">Cancelar</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

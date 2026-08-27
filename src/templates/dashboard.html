@@ -1,0 +1,138 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="page-title">Visão Geral</div>
+<div class="page-sub">Bem-vindo de volta, {{ nome }}. Aqui estão as atividades de hoje.</div>
+
+<div class="cards-grid">
+    <div class="card">
+        <div class="card-label">Total de Reservas</div>
+        <div class="card-value">{{ total_reservas }}</div>
+        <div class="card-sub" style="color: var(--success);">Sincronizado com sistema</div>
+    </div>
+    <div class="card">
+        <div class="card-label">Sua Próxima Reserva</div>
+        {% if proxima_reserva %}
+            <div class="card-value" style="font-size: 16px; margin-top: 4px; color: var(--primary);">{{ proxima_reserva.sala }}</div>
+            <div class="card-sub">{{ proxima_reserva.dia }} às {{ proxima_reserva.inicio }}</div>
+        {% else %}
+            <div class="card-value" style="font-size: 16px; margin-top: 4px;">Nenhuma</div>
+            <div class="card-sub">Agende uma sala</div>
+        {% endif %}
+    </div>
+    <div class="card">
+        <div class="card-label">Salas Disponíveis Agora</div>
+        <div class="card-value pink">{{ salas_disponiveis }}</div>
+        <div class="card-sub">De um total de {{ '%02d' % total_salas }} salas</div>
+    </div>
+    <div class="card">
+        <div class="card-label">Status do Sistema</div>
+        <div class="card-value green" style="font-size: 15px; margin-top: 4px;">Operacional</div>
+        <div class="card-sub">Latência: 14ms</div>
+    </div>
+</div>
+
+<div class="section-header">
+    <div class="section-title">Ações Rápidas</div>
+</div>
+<div class="quick-actions">
+    <a href="{{ url_for('views.reservar') }}" class="action-btn">
+        <span class="action-icon">📅</span>
+        <span class="action-label">Nova Reserva</span>
+        <span class="action-desc">Agendar uma sala disponível</span>
+    </a>
+    <a href="{{ url_for('views.reservas_view') }}" class="action-btn">
+        <span class="action-icon">🗓️</span>
+        <span class="action-label">Ver Agenda do Dia</span>
+        <span class="action-desc">Todas as reservas de hoje</span>
+    </a>
+    <a href="{{ url_for('views.reservar') }}" class="action-btn">
+        <span class="action-icon">🔍</span>
+        <span class="action-label">Buscar Sala Livre</span>
+        <span class="action-desc">Verificar disponibilidade</span>
+    </a>
+</div>
+
+<div class="two-col" style="margin-top: 32px;">
+    <!-- Status das salas -->
+    <div class="panel">
+        <div class="panel-title">Status das Salas (Tempo Real)</div>
+        {% for sala in todas_salas %}
+        <div class="room-item">
+            <div class="room-info">
+                <div class="room-dot {% if sala in salas_ocupadas_agora %}busy{% else %}available{% endif %}"></div>
+                <div>
+                    <div class="room-name">{{ sala }}</div>
+                    <div class="room-cap">Capacidade: {{ capacidades[sala] }} pessoas</div>
+                </div>
+            </div>
+            <span class="badge {% if sala in salas_ocupadas_agora %}busy{% else %}available{% endif %}">
+                {% if sala in salas_ocupadas_agora %}Ocupada{% else %}Disponível{% endif %}
+            </span>
+        </div>
+        {% endfor %}
+
+        <div style="margin-top:24px;">
+            <div class="panel-title">Ocupação Hoje</div>
+            {% for sala, perc in ocupacao.items() %}
+            <div class="usage-bar-wrap">
+                <div class="usage-bar-label">
+                    <span>{{ sala }}</span>
+                    <span style="color: {% if perc < 50 %}var(--success){% elif perc < 80 %}var(--orange){% else %}var(--primary){% endif %};">{{ perc }}%</span>
+                </div>
+                <div class="usage-bar">
+                    <div class="usage-fill" style="width:{{ perc }}%; background: {% if perc < 50 %}var(--success){% elif perc < 80 %}var(--orange){% else %}var(--primary){% endif %};"></div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- Agenda do dia -->
+    <div class="panel">
+        <div class="panel-title">Resumo de Atividades</div>
+        {% if atividades %}
+            {% for a in atividades[:4] %}
+            <div class="schedule-row">
+                <div class="schedule-time">{{ a.inicio }} – {{ a.fim }}</div>
+                <div class="schedule-card {% if loop.index is even %}pink{% else %}blue{% endif %}">
+                    <div class="schedule-event">{{ a.sala }}</div>
+                    <div class="schedule-meta">{{ a.dia }}</div>
+                </div>
+            </div>
+            {% endfor %}
+        {% else %}
+            <div style="text-align: center; padding: 40px 0; color: var(--text-muted); font-size: 13px;">
+                Sem compromissos agendados.
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Últimas atividades -->
+<div class="panel">
+    <div class="section-header" style="margin-bottom:14px; margin-top: 0;">
+        <div class="section-title">Suas Últimas Reservas</div>
+        <a href="{{ url_for('views.reservas_view') }}" class="ver-tudo">Ver tudo →</a>
+    </div>
+    {% if atividades %}
+        <table style="width: 100%;">
+            <thead>
+                <tr>
+                    <th style="padding: 10px 0;">SALA</th>
+                    <th style="padding: 10px 0;">DIA</th>
+                    <th style="padding: 10px 0;">HORÁRIO</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for a in atividades[:3] %}
+                <tr>
+                    <td style="padding: 12px 0; font-weight: 500;">{{ a.sala }}</td>
+                    <td style="padding: 12px 0;">{{ a.dia }}</td>
+                    <td style="padding: 12px 0; color: var(--primary);">{{ a.inicio }} - {{ a.fim }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% endif %}
+</div>
+{% endblock %}

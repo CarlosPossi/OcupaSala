@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+{% block content %}
+<header style="margin-bottom: 40px; display: flex; justify-content: space-between; align-items: flex-end;">
+    <div>
+        <h1 style="font-size: 2.25rem; font-weight: 800; letter-spacing: -0.025em;">Quadro de Reservas</h1>
+        <p style="color: var(--text-secondary); margin-top: 4px;">Gerencie todos os agendamentos realizados no sistema.</p>
+    </div>
+    <a href="{{ url_for('views.reservar') }}" class="btn btn-primary" style="width: auto;">+ Nova Reserva</a>
+</header>
+
+<div class="table-container">
+    <table>
+        <thead>
+            <tr>
+                <th>DIA</th>
+                <th>SALA</th>
+                <th>HORÁRIO</th>
+                <th>RESERVADO POR</th>
+                <th>STATUS</th>
+                <th style="text-align: right;">AÇÕES</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% if reservas %}
+                {% for r in reservas %}
+                <tr>
+                    <td style="font-weight: 600; color: var(--text-secondary);">{{ r.dia }}</td>
+                    <td style="font-weight: 600;">{{ r.sala }}</td>
+                    <td style="color: var(--primary); font-weight: 700;">{{ r.inicio }} - {{ r.fim }}</td>
+                    <td>
+                        <div style="display: flex; flex-direction: column;">
+                            <span style="font-weight: 500;">{{ r.nome }}</span>
+                            <span style="font-size: 0.75rem; color: var(--text-secondary);">{{ r.email }}</span>
+                        </div>
+                    </td>
+                    <td><span class="badge available" style="border: 1px solid var(--success);">Confirmado</span></td>
+                    <td style="text-align: right;">
+                        {% if r.email == user_email %}
+                        <form method="POST" action="{{ url_for('views.cancelar') }}" style="margin: 0; display: inline;">
+                            <input type="hidden" name="sala" value="{{ r.sala }}">
+                            <input type="hidden" name="dia" value="{{ r.dia }}">
+                            <input type="hidden" name="inicio" value="{{ r.inicio }}">
+                            <input type="hidden" name="fim" value="{{ r.fim }}">
+                            <button type="submit" class="btn btn-danger" style="padding: 8px 16px;" onclick="return confirm('Confirmar cancelamento?')">Cancelar</button>
+                        </form>
+                        {% else %}
+                        <span style="color: var(--text-secondary); font-size: 0.75rem;">Sem permissão</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            {% else %}
+                <tr>
+                    <td colspan="5" style="text-align: center; padding: 60px; color: var(--text-secondary);">
+                        Nenhuma reserva encontrada.
+                    </td>
+                </tr>
+            {% endif %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

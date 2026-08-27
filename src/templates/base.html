@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OcupaSala | Reserva de Salas FIAP</title>
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='img/favicon.png') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+<body>
+    {% if session.get('user_email') %}
+    <div class="dash">
+        <aside class="sidebar">
+            <a href="{{ url_for('views.dashboard') }}" class="brand">
+                <div class="brand-icon">
+                    <img src="{{ url_for('static', filename='img/logo-icon.png') }}" alt="OcupaSala">
+                </div>
+                <span class="brand-name">OcupaSala</span>
+            </a>
+
+            <nav style="flex: 1;">
+                <a href="{{ url_for('views.dashboard') }}"
+                    class="nav-item {% if request.endpoint == 'views.dashboard' %}active{% endif %}">Dashboard</a>
+                <a href="{{ url_for('views.reservar') }}"
+                    class="nav-item {% if request.endpoint == 'views.reservar' %}active{% endif %}">Reservar Sala</a>
+                <a href="{{ url_for('views.reservas_view') }}"
+                    class="nav-item {% if request.endpoint == 'views.reservas_view' %}active{% endif %}">Quadro de
+                    Reservas</a>
+                <a href="{{ url_for('views.relatorios') }}"
+                    class="nav-item {% if request.endpoint == 'views.relatorios' %}active{% endif %}"
+                    style="margin-top:8px;">Relatórios</a>
+                <a href="{{ url_for('views.configuracoes') }}"
+                    class="nav-item {% if request.endpoint == 'views.configuracoes' %}active{% endif %}">Configurações</a>
+            </nav>
+
+            <div class="user-section">
+                <div class="user-name">{{ session.get('user_nome') }}</div>
+                <div class="user-role">Aluno FIAP</div>
+                <a href="{{ url_for('auth.logout') }}"
+                    style="color: var(--primary); font-size: 10px; text-decoration: none; display: block; margin-top: 8px; font-weight: 600;">SAIR
+                    DO SISTEMA</a>
+            </div>
+        </aside>
+
+        <main class="main">
+            {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+            {% for category, message in messages %}
+            <div class="alert {{ category }}">{{ message }}</div>
+            {% endfor %}
+            {% endif %}
+            {% endwith %}
+
+            {% block content %}{% endblock %}
+        </main>
+    </div>
+    {% else %}
+    <div class="auth-wrapper">
+        <div style="width: 100%; max-width: 420px; padding: 0 20px;">
+            {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+            {% for category, message in messages %}
+            <div class="alert {{ category }}">{{ message }}</div>
+            {% endfor %}
+            {% endif %}
+            {% endwith %}
+
+            {% block auth_content %}{% endblock %}
+        </div>
+    </div>
+    {% endif %}
+</body>
+
+</html>

@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="page-title">Configurações</div>
+<div class="page-sub">Gerencie seu perfil e preferências do sistema.</div>
+
+<div style="max-width: 600px;">
+    <div class="panel" style="margin-bottom: 24px;">
+        <div class="panel-title">Seu Perfil</div>
+        <div class="form-group">
+            <label>Nome para exibição</label>
+            <input type="text" value="{{ session.get('user_nome') }}" disabled>
+        </div>
+        <div class="form-group">
+            <label>E-mail corporativo</label>
+            <input type="email" value="{{ session.get('user_email') }}" disabled>
+        </div>
+        <button class="btn btn-primary" style="width: auto;">Atualizar Perfil</button>
+    </div>
+
+    <div class="panel">
+        <div class="panel-title">Preferências</div>
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+            <div>
+                <div style="font-weight: 600;">Notificações por E-mail</div>
+                <div style="font-size: 12px; color: var(--text-muted);">Receba lembretes 15 min antes da reserva</div>
+            </div>
+            <input type="checkbox" checked style="width: 20px; height: 20px;">
+        </div>
+        <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--border); padding-top: 16px;">
+            <div>
+                <div style="font-weight: 600;">Modo Escuro</div>
+                <div style="font-size: 12px; color: var(--text-muted);">O sistema já está otimizado para seu conforto</div>
+            </div>
+            <span style="color: var(--success); font-weight: 700;">ATIVO</span>
+        </div>
+    </div>
+</div>
+{% endblock %}

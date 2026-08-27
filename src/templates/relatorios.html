@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="page-title">Relatórios e Estatísticas</div>
+<div class="page-sub">Análise detalhada do uso das salas de estudo.</div>
+
+<div class="cards-grid">
+    <div class="card">
+        <div class="card-label">Total Histórico</div>
+        <div class="card-value blue">{{ total }}</div>
+        <div class="card-sub">Reservas desde o início</div>
+    </div>
+    <div class="card">
+        <div class="card-label">Média Semanal</div>
+        <div class="card-value pink">~8</div>
+        <div class="card-sub">Reservas por semana</div>
+    </div>
+    <div class="card">
+        <div class="card-label">Pico de Horário</div>
+        <div class="card-value green">14:30</div>
+        <div class="card-sub">Horário mais concorrido</div>
+    </div>
+    <div class="card">
+        <div class="card-label">Economia de Tempo</div>
+        <div class="card-value">12h</div>
+        <div class="card-sub">Estimativa de agilidade</div>
+    </div>
+</div>
+
+<div class="panel">
+    <div class="panel-title">Uso por Sala (Histórico)</div>
+    <div class="usage-bar-wrap">
+        <div class="usage-bar-label"><span>Sala 1</span><span>45%</span></div>
+        <div class="usage-bar"><div class="usage-fill" style="width:45%; background: var(--success);"></div></div>
+    </div>
+    <div class="usage-bar-wrap">
+        <div class="usage-bar-label"><span>Sala 2</span><span>72%</span></div>
+        <div class="usage-bar"><div class="usage-fill" style="width:72%; background: var(--primary);"></div></div>
+    </div>
+    <div class="usage-bar-wrap">
+        <div class="usage-bar-label"><span>Sala 3</span><span>30%</span></div>
+        <div class="usage-bar"><div class="usage-fill" style="width:30%; background: var(--blue);"></div></div>
+    </div>
+</div>
+{% endblock %}
