@@ -1,19 +1,11 @@
 # 🏫 FIAP Room Reservation System
 
-![thumbnail](docs/image.png)
 
 ## 📌 Descrição do Problema
 A dificuldade de encontrar salas disponíveis para estudo e a falta de uma organização centralizada para reservas geram conflitos e desperdício de tempo para alunos e funcionários da FIAP. O sistema manual ou a falta dele torna o processo ineficiente.
 
 ## 💡 Solução Proposta
 Desenvolvemos uma aplicação web intuitiva utilizando **Python e Flask** que centraliza a gestão de salas. O sistema permite que usuários se cadastrem, realizem login e gerenciem suas reservas de forma autônoma. Um dashboard interativo fornece uma visão clara da ocupação das salas em tempo real, otimizando o uso dos espaços físicos da instituição.
-
-## 🚀 Evoluções do Checkpoint 1 para o Checkpoint 2
-* **Interface:** Transição de uma aplicação via terminal (CLI) para uma interface Web moderna e responsiva.
-* **Arquitetura:** Reestruturação do código seguindo o padrão modular com **Blueprints**, separando rotas de autenticação, lógica de visualização e modelos.
-* **Funcionalidades:** Inclusão de um sistema de **Autenticação (Login/Cadastro)** com hash de senha para segurança.
-* **Persistência:** Melhoria na organização dos dados em arquivos JSON estruturados.
-* **Visualização:** Implementação de um **Dashboard de Ocupação** com estatísticas e filtros de data/horário.
 
 ## 🛠️ Tecnologias Utilizadas
 * **Linguagem:** [Python 3.10+](https://www.python.org/)
@@ -59,18 +51,6 @@ O sistema estará disponível em `http://localhost:5000`.
 * **Cadastro:** Permite novos usuários criarem contas com validação básica.
 * **Login:** Acesso restrito via e-mail e senha, com sessões seguras.
 
-### Casos de Uso
-| Caso de Uso | Status |
-| :--- | :--- |
-| Criar conta de usuário | ✅ Implementado |
-| Autenticar usuário (Login/Logout) | ✅ Implementado |
-| Visualizar disponibilidade de salas no Dashboard | ✅ Implementado |
-| Realizar reserva de sala | ✅ Implementado |
-| Validar conflitos de horário em reservas | ✅ Implementado |
-| Listar minhas reservas e todas as reservas | ✅ Implementado |
-| Cancelar reserva própria | ✅ Implementado |
-| Gerar relatórios de ocupação | ⚠️ Parcial |
-
 ## 🌟 Diferencial do Projeto
 
 ### Descrição
@@ -79,21 +59,13 @@ O grande diferencial é o **Dashboard de Ocupação Inteligente**. Ele não apen
 ### Justificativa
 Em ambientes acadêmicos dinâmicos, a visualização rápida e gráfica da disponibilidade é mais eficiente do que ler tabelas de horários. Isso permite uma tomada de decisão imediata pelo aluno que busca um local para estudar.
 
-### Referências
-* [Documentação Flask](https://flask.palletsprojects.com/en/3.0.x/)
-* [Jinja2 Documentation](https://jinja.palletsprojects.com/en/3.1.x/)
-* [FIAP - Material de Microservices and Web Applications](https://www.fiap.com.br/)
-
-## 🎥 Demonstração
-![Demo do sistema](docs/animacao.gif)
-*Veja o funcionamento básico do sistema no GIF acima.*
-
 ## 👥 Integrantes do Grupo
 * **Fabio Henrique Santos Farias** (RM: 552453)
 * **Carlos Augusto da Cruz Possi** (RM: 558758)
 * **João Pedro Bernardo Santos da Silva** (RM: 557142)
 
 ## 🔗 Links
-🧠 **Miro (Documentação e Diagramas):** [Acessar Board](https://miro.com/app/board/uXjVGwGD7H4=/?share_link_id=899993910065)  
-💻 **Google Colab (Protótipo Inicial):** [Acessar Notebook](https://colab.research.google.com/drive/1IDkm92TqKFn3YvFlW22JfamUdzKsnMz9?usp=sharing)  
-📺 **Render:** [Link do deploy](https://fiap-room-reservation-system.onrender.com/)  
+🧠 **Miro (Documentação e Diagramas):** [Acessar Board](https://miro.com/app/board/uXjVHsCVu7Q=/)  
+🧠 **Trello (Tarefas):** [Acessar Tarefas](https://trello.com/invite/b/6a8f911f7186e4e292d7e506/ATTIfa996809f947fda12cfdca5966903b0f232992B6/checkpoint-4)
+
+
