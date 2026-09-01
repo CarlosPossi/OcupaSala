@@ -1,4 +1,4 @@
-# 🏫 FIAP Room Reservation System
+# 🏫 OcupaSala
 
 
 ## 📌 Descrição do Problema
