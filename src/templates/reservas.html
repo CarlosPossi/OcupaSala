@@ -1,62 +1,87 @@
 {% extends "base.html" %}
+{% from "_icons.html" import ico %}
+{% from "_components.html" import header, data_br %}
+{% block title %}Quadro de reservas{% endblock %}
 {% block content %}
-<header style="margin-bottom: 40px; display: flex; justify-content: space-between; align-items: flex-end;">
-    <div>
-        <h1 style="font-size: 2.25rem; font-weight: 800; letter-spacing: -0.025em;">Quadro de Reservas</h1>
-        <p style="color: var(--text-secondary); margin-top: 4px;">Gerencie todos os agendamentos realizados no sistema.</p>
-    </div>
-    <a href="{{ url_for('views.reservar') }}" class="btn btn-primary" style="width: auto;">+ Nova Reserva</a>
-</header>
+{% call header("Quadro de reservas", "Todos os agendamentos do sistema. Você só pode cancelar as reservas que fez.") %}
+<a href="{{ url_for('views.exportar_ics') }}" class="btn btn-secondary">{{ ico('download', 16) }}Exportar minha agenda
+    (.ics)</a>
+<a href="{{ url_for('views.reservar') }}" class="btn btn-primary">{{ ico('plus', 16) }}Nova reserva</a>
+{% endcall %}
 
-<div class="table-container">
-    <table>
-        <thead>
-            <tr>
-                <th>DIA</th>
-                <th>SALA</th>
-                <th>HORÁRIO</th>
-                <th>RESERVADO POR</th>
-                <th>STATUS</th>
-                <th style="text-align: right;">AÇÕES</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% if reservas %}
-                {% for r in reservas %}
+<div class="tabs">
+    {% for k, nome in [('proximas', 'Próximas'), ('minhas', 'Minhas'), ('concluidas', 'Concluídas'), ('todas', 'Todas')]
+    %}
+    <a href="{{ url_for('views.reservas_view', visao=k) }}" class="tab {{ 'active' if visao == k }}">{{ nome }} <span
+            class="tab-count">{{ contagem[k] }}</span></a>
+    {% endfor %}
+</div>
+
+<div class="panel table-panel">
+    {% if reservas %}
+    <div class="table-scroll">
+        <table>
+            <thead>
                 <tr>
-                    <td style="font-weight: 600; color: var(--text-secondary);">{{ r.dia }}</td>
-                    <td style="font-weight: 600;">{{ r.sala }}</td>
-                    <td style="color: var(--primary); font-weight: 700;">{{ r.inicio }} - {{ r.fim }}</td>
+                    <th>Dia</th>
+                    <th>Espaço</th>
+                    <th>Horário</th>
+                    <th>Reservado por</th>
+                    <th>Status</th>
+                    <th style="text-align: right;">Ações</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for r in reservas %}
+                <tr class="{{ 'row-done' if r.status == 'concluida' }}">
+                    <td class="td-strong">{{ data_br(r.dia)[:5] }}</td>
                     <td>
-                        <div style="display: flex; flex-direction: column;">
-                            <span style="font-weight: 500;">{{ r.nome }}</span>
-                            <span style="font-size: 0.75rem; color: var(--text-secondary);">{{ r.email }}</span>
+                        <div class="td-strong">{{ r.sala }}</div>
+                        {% if r.titulo %}<div class="td-sub">{{ r.titulo }}</div>{% endif %}
+                    </td>
+                    <td class="td-time">{{ r.inicio }} – {{ r.fim }}</td>
+                    <td>
+                        <div class="who"><span class="mini-avatar">{{ (r.nome or '?')[0] }}</span>
+                            <div>
+                                <div>{{ r.nome }}</div>
+                                <div class="td-sub">{{ r.participantes }} pessoa(s){% if r.serie_id %} · {{
+                                    ico('repeat', 11) }} semanal{% endif %}</div>
+                            </div>
                         </div>
                     </td>
-                    <td><span class="badge available" style="border: 1px solid var(--success);">Confirmado</span></td>
+                    <td>
+                        {% if r.status == 'andamento' %}<span class="badge busy">Em andamento</span>
+                        {% elif r.status == 'proxima' %}<span class="badge available">Confirmada</span>
+                        {% else %}<span class="badge muted">Concluída</span>{% endif %}
+                    </td>
                     <td style="text-align: right;">
-                        {% if r.email == user_email %}
-                        <form method="POST" action="{{ url_for('views.cancelar') }}" style="margin: 0; display: inline;">
-                            <input type="hidden" name="sala" value="{{ r.sala }}">
-                            <input type="hidden" name="dia" value="{{ r.dia }}">
-                            <input type="hidden" name="inicio" value="{{ r.inicio }}">
-                            <input type="hidden" name="fim" value="{{ r.fim }}">
-                            <button type="submit" class="btn btn-danger" style="padding: 8px 16px;" onclick="return confirm('Confirmar cancelamento?')">Cancelar</button>
+                        {% if r.email == user_email and r.status != 'concluida' %}
+                        <form method="POST" action="{{ url_for('views.cancelar') }}" class="cancel-form">
+                            <input type="hidden" name="id" value="{{ r.id }}">
+                            {% if r.serie_id %}
+                            <select name="escopo" aria-label="Escopo do cancelamento">
+                                <option value="uma">Só esta</option>
+                                <option value="serie">Esta e as seguintes</option>
+                            </select>
+                            {% endif %}
+                            <button type="submit" class="btn btn-danger btn-sm"
+                                onclick="return confirm('Confirmar cancelamento?')">Cancelar</button>
                         </form>
-                        {% else %}
-                        <span style="color: var(--text-secondary); font-size: 0.75rem;">Sem permissão</span>
+                        {% elif r.email != user_email %}<span class="td-sub">—</span>
                         {% endif %}
                     </td>
                 </tr>
                 {% endfor %}
-            {% else %}
-                <tr>
-                    <td colspan="5" style="text-align: center; padding: 60px; color: var(--text-secondary);">
-                        Nenhuma reserva encontrada.
-                    </td>
-                </tr>
-            {% endif %}
-        </tbody>
-    </table>
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div class="empty-state">
+        <div class="empty-state-icon">{{ ico('list', 28) }}</div>
+        <div class="empty-state-title">Nenhuma reserva nesta visão</div>
+        <div class="empty-state-sub"><a href="{{ url_for('views.reservar') }}" class="ver-tudo">Faça sua primeira
+                reserva →</a></div>
+    </div>
+    {% endif %}
 </div>
 {% endblock %}

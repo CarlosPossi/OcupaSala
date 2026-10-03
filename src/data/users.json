@@ -1,7 +1,22 @@
 [
-    {
-        "nome": "Carlos Augusto da Cruz Possi",
-        "email": "carlos.possi@fiap.com",
-        "senha": "scrypt:32768:8:1$4n3Og4Dy4c9jEnkH$99c20a66426e224d95a7dfc197ecce530522b39f8664506b90e6476f5269430de1a635c8f48f24d377da81f488810b4f663baf31bc05cf8ea650eeeebd3776ee"
-    }
+  {
+    "nome": "Mariana Souza",
+    "email": "mariana.souza@faculdade-demo.com",
+    "senha": "scrypt:32768:8:1$qmBsCcMNeiKkdDE3$d7708793e8d4e7af80aa3fdbf04a8fa13aabf73a5ed3e04f06ea3aea084a850674b6a0a158f55437800028cb9d51704a8adf03e9cd97ffe6307d325bd45dfa7b"
+  },
+  {
+    "nome": "Rafael Lima",
+    "email": "rafael.lima@empresa-demo.com",
+    "senha": "scrypt:32768:8:1$n5xZjtmyEuprScpl$dd695fdbf24f8ad667d6012cb9f02e5cf1c6a1119ee0b964ab708e65ba9d8d198024fa5e1772dab0c152ff934626b835a38ce90b961f69fb8ab220e048205f7a"
+  },
+  {
+    "nome": "Ana Torres",
+    "email": "ana.torres@escola-demo.com",
+    "senha": "scrypt:32768:8:1$9zSVgFRXdvzEQqav$c42d04e705dc5e16d8f47dbe1d91e5481bc8be8dcc413544ec1b93d7d721863315dd18d8456e9c554f974107ce6aafe3b1f27bff3f580f06c923438f158efd3c"
+  },
+  {
+    "nome": "Carlos Augusto da Cruz Possi",
+    "email": "carlos.possi@fiap.com",
+    "senha": "scrypt:32768:8:1$eYRwNsVib0S0alPL$60211f97e47d921f86fa4bef1b10e34f30519cb0ffa5fe6b046deb7146b9d938a15b654aadfe3a3433155af3d527798cdbed51a6d14bdddf1f13b4f159299b67"
+  }
 ]

@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+{% from "_icons.html" import ico %}
+{% from "_components.html" import tags, header %}
+{% block title %}Gerenciar espaços{% endblock %}
+{% block content %}
+{{ header("Gerenciar espaços", "Cadastre espaços reserváveis — sala de aula, reunião, laboratório, auditório, estação de
+trabalho... o que fizer sentido para a sua organização.") }}
+
+<div class="panel" style="margin-bottom: 32px;">
+    <div class="panel-title">Novo espaço</div>
+    <form method="POST" action="{{ url_for('views.espacos') }}">
+        <div class="form-row">
+            <div class="form-group">
+                <label for="nome">Nome do espaço</label>
+                <input id="nome" type="text" name="nome" required placeholder="Ex.: Sala de Reunião C">
+            </div>
+            <div class="form-group">
+                <label for="tipo">Tipo</label>
+                <input id="tipo" type="text" name="tipo" list="tipos-sugestao" required
+                    placeholder="Ex.: Sala de Reunião">
+                <datalist id="tipos-sugestao">
+                    <option value="Sala de Aula">
+                    <option value="Laboratório">
+                    <option value="Sala de Reunião">
+                    <option value="Sala de Estudo">
+                    <option value="Auditório">
+                    <option value="Estação de Trabalho">
+                </datalist>
+            </div>
+            <div class="form-group">
+                <label for="unidade">Unidade / Organização</label>
+                <input id="unidade" type="text" name="unidade" list="unidades-sugestao" required
+                    placeholder="Ex.: Escritório">
+                <datalist id="unidades-sugestao">
+                    <option value="Faculdade">
+                    <option value="Escola">
+                    <option value="Escritório">
+                </datalist>
+            </div>
+            <div class="form-group">
+                <label for="capacidade">Capacidade (pessoas)</label>
+                <input id="capacidade" type="number" name="capacidade" min="1" required placeholder="Ex.: 8">
+            </div>
+        </div>
+        <button type="submit" class="btn btn-primary">{{ ico('plus', 16) }}Adicionar espaço</button>
+    </form>
+</div>
+
+<div class="section-header" style="margin-top: 0;">
+    <div class="section-title">Espaços cadastrados ({{ salas|length }})</div>
+</div>
+
+{% if salas %}
+<div class="spaces-grid">
+    {% for sala in salas %}
+    <div class="space-card">
+        <div class="space-card-top">
+            <div class="space-name">{{ sala.nome }}</div>
+            <form method="POST" action="{{ url_for('views.excluir_espaco') }}"
+                onsubmit="return confirm('Remover {{ sala.nome|e }}? Só é possível se o espaço não tiver reservas.');">
+                <input type="hidden" name="nome" value="{{ sala.nome }}">
+                <button type="submit" class="space-delete" title="Remover espaço"
+                    aria-label="Remover {{ sala.nome }}">{{ ico('trash', 15) }}</button>
+            </form>
+        </div>
+        <div class="space-tags">{{ tags(sala) }}</div>
+        <div class="space-cap">{{ ico('users', 14) }} {{ sala.capacidade }} pessoas · {{
+            reservas_por_sala.get(sala.nome, 0) }} reserva(s)</div>
+    </div>
+    {% endfor %}
+</div>
+{% else %}
+<div class="panel">
+    <div class="empty-state">
+        <div class="empty-state-icon">{{ ico('door', 28) }}</div>
+        <div class="empty-state-title">Nenhum espaço cadastrado ainda</div>
+        <div class="empty-state-sub">Use o formulário acima para criar o primeiro.</div>
+    </div>
+</div>
+{% endif %}
+{% endblock %}

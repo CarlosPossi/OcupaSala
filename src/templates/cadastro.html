@@ -1,31 +1,32 @@
 {% extends "base.html" %}
+{% block title %}Criar conta{% endblock %}
 {% block auth_content %}
-<div class="auth-logo">
-    <img src="{{ url_for('static', filename='img/logo-full.png') }}" alt="OcupaSala">
-</div>
 <div class="auth-card">
-    <div style="text-align: center; margin-bottom: 40px;">
-        <h1 style="color: var(--navy); font-family: var(--font-heading); font-weight: 700; font-size: 2rem; letter-spacing: -0.02em;">Criar conta</h1>
-        <p style="color: var(--text-secondary); margin-top: 8px;">Comece a gerenciar suas salas agora.</p>
+    <div class="auth-head">
+        <h1>Criar conta</h1>
+        <p>Comece a gerenciar seus espaços agora.</p>
     </div>
-    
+
     <form method="POST" action="{{ url_for('auth.cadastro') }}">
         <div class="form-group">
-            <label>Nome Completo</label>
-            <input type="text" name="nome" required placeholder="Como quer ser chamado?">
+            <label for="nome">Nome completo</label>
+            <input id="nome" type="text" name="nome" required minlength="2" placeholder="Como quer ser chamado?"
+                autocomplete="name">
         </div>
         <div class="form-group">
-            <label>E-mail Institucional</label>
-            <input type="email" name="email" required placeholder="aluno@fiap.com.br">
+            <label for="email">E-mail</label>
+            <input id="email" type="email" name="email" required placeholder="seuemail@empresa.com"
+                autocomplete="username">
         </div>
-        <div class="form-group" style="margin-bottom: 32px;">
-            <label>Senha</label>
-            <input type="password" name="senha" required placeholder="Mínimo 6 caracteres">
+        <div class="form-group" style="margin-bottom: 28px;">
+            <label for="senha">Senha</label>
+            <input id="senha" type="password" name="senha" required minlength="6" placeholder="Mínimo 6 caracteres"
+                autocomplete="new-password">
         </div>
-        <button type="submit" class="btn btn-primary">Criar Conta</button>
+        <button type="submit" class="btn btn-primary btn-block">Criar conta</button>
     </form>
-    <p style="margin-top: 32px; font-size: 0.875rem; color: var(--text-secondary);">
-        Já possui conta? <a href="{{ url_for('auth.login') }}" style="color: var(--primary); font-weight: 600; text-decoration: none;">Fazer Login</a>
+    <p class="auth-foot">
+        Já possui conta? <a href="{{ url_for('auth.login') }}">Fazer login</a>
     </p>
 </div>
 {% endblock %}

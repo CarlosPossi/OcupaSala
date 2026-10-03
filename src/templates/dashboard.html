@@ -1,138 +1,134 @@
 {% extends "base.html" %}
+{% from "_icons.html" import ico %}
+{% from "_components.html" import tags, header, data_br %}
+{% block title %}Dashboard{% endblock %}
 {% block content %}
-<div class="page-title">Visão Geral</div>
-<div class="page-sub">Bem-vindo de volta, {{ nome }}. Aqui estão as atividades de hoje.</div>
+{% call header("Visão Geral", "Olá, " ~ nome.split(' ')[0] ~ ". Aqui está a situação dos espaços agora (" ~ hora ~ ") e
+as atividades de hoje.") %}
+<a href="{{ url_for('views.reservar') }}" class="btn btn-primary">{{ ico('plus', 16) }}Nova reserva</a>
+{% endcall %}
 
 <div class="cards-grid">
     <div class="card">
-        <div class="card-label">Total de Reservas</div>
-        <div class="card-value">{{ total_reservas }}</div>
-        <div class="card-sub" style="color: var(--success);">Sincronizado com sistema</div>
+        <div class="card-label">Reservas hoje</div>
+        <div class="card-value">{{ reservas_hoje }}</div>
+        <div class="card-sub">Em todos os espaços</div>
     </div>
     <div class="card">
-        <div class="card-label">Sua Próxima Reserva</div>
-        {% if proxima_reserva %}
-            <div class="card-value" style="font-size: 16px; margin-top: 4px; color: var(--primary);">{{ proxima_reserva.sala }}</div>
-            <div class="card-sub">{{ proxima_reserva.dia }} às {{ proxima_reserva.inicio }}</div>
+        <div class="card-label">Sua próxima reserva</div>
+        {% if proxima %}
+        <div class="card-value card-value-sm">{{ proxima.sala }}</div>
+        <div class="card-sub">{{ data_br(proxima.dia)[:5] }} · {{ proxima.inicio }}–{{ proxima.fim }}{% if
+            proxima.titulo %} · {{ proxima.titulo }}{% endif %}</div>
         {% else %}
-            <div class="card-value" style="font-size: 16px; margin-top: 4px;">Nenhuma</div>
-            <div class="card-sub">Agende uma sala</div>
+        <div class="card-value card-value-sm">Nenhuma</div>
+        <div class="card-sub">Agende um espaço</div>
         {% endif %}
     </div>
     <div class="card">
-        <div class="card-label">Salas Disponíveis Agora</div>
-        <div class="card-value pink">{{ salas_disponiveis }}</div>
-        <div class="card-sub">De um total de {{ '%02d' % total_salas }} salas</div>
+        <div class="card-label">Espaços livres agora</div>
+        <div class="card-value pink">{{ livres }}<span class="card-of"> / {{ total_salas }}</span></div>
+        <div class="card-sub">Disponíveis neste momento</div>
     </div>
     <div class="card">
-        <div class="card-label">Status do Sistema</div>
-        <div class="card-value green" style="font-size: 15px; margin-top: 4px;">Operacional</div>
-        <div class="card-sub">Latência: 14ms</div>
+        <div class="card-label">Ocupação média hoje</div>
+        <div class="card-value green">{{ media_ocup }}%</div>
+        <div class="usage-bar mini">
+            <div class="usage-fill" style="width:{{ media_ocup }}%; background: var(--success);"></div>
+        </div>
     </div>
 </div>
 
-<div class="section-header">
-    <div class="section-title">Ações Rápidas</div>
-</div>
 <div class="quick-actions">
     <a href="{{ url_for('views.reservar') }}" class="action-btn">
-        <span class="action-icon">📅</span>
-        <span class="action-label">Nova Reserva</span>
-        <span class="action-desc">Agendar uma sala disponível</span>
+        <span class="action-icon">{{ ico('plus', 22) }}</span>
+        <span class="action-label">Nova reserva</span>
+        <span class="action-desc">Com recorrência semanal</span>
     </a>
-    <a href="{{ url_for('views.reservas_view') }}" class="action-btn">
-        <span class="action-icon">🗓️</span>
-        <span class="action-label">Ver Agenda do Dia</span>
-        <span class="action-desc">Todas as reservas de hoje</span>
+    <a href="{{ url_for('views.disponibilidade') }}" class="action-btn">
+        <span class="action-icon">{{ ico('search', 22) }}</span>
+        <span class="action-label">Buscar espaço livre</span>
+        <span class="action-desc">Por horário, lotação e tipo</span>
     </a>
-    <a href="{{ url_for('views.reservar') }}" class="action-btn">
-        <span class="action-icon">🔍</span>
-        <span class="action-label">Buscar Sala Livre</span>
-        <span class="action-desc">Verificar disponibilidade</span>
+    <a href="{{ url_for('views.agenda') }}" class="action-btn">
+        <span class="action-icon">{{ ico('timeline', 22) }}</span>
+        <span class="action-label">Agenda do dia</span>
+        <span class="action-desc">Linha do tempo por espaço</span>
+    </a>
+    <a href="{{ url_for('views.exportar_ics') }}" class="action-btn">
+        <span class="action-icon">{{ ico('download', 22) }}</span>
+        <span class="action-label">Exportar minha agenda</span>
+        <span class="action-desc">Arquivo .ics (Google, Outlook)</span>
     </a>
 </div>
 
-<div class="two-col" style="margin-top: 32px;">
-    <!-- Status das salas -->
+<div class="two-col">
     <div class="panel">
-        <div class="panel-title">Status das Salas (Tempo Real)</div>
-        {% for sala in todas_salas %}
+        <div class="panel-title">Status dos espaços · tempo real</div>
+        {% for s in salas %}
+        {% set st = situacao[s.nome] %}
         <div class="room-item">
             <div class="room-info">
-                <div class="room-dot {% if sala in salas_ocupadas_agora %}busy{% else %}available{% endif %}"></div>
+                <div class="room-dot {{ 'busy' if st.ocupada else 'available' }}"></div>
                 <div>
-                    <div class="room-name">{{ sala }}</div>
-                    <div class="room-cap">Capacidade: {{ capacidades[sala] }} pessoas</div>
+                    <div class="room-name">{{ s.nome }}</div>
+                    <div class="room-meta">{{ tags(s) }}<span class="room-cap">até {{ s.capacidade }} pessoas</span>
+                    </div>
+                    <div class="room-status">
+                        {% if st.ocupada %}Ocupada até {{ st.ate }}{% if st.por %} · {{ st.por.split(' ')[0] }}{% endif
+                        %}
+                        {% elif st.ate %}Livre até {{ st.ate }}
+                        {% else %}Livre pelo resto do dia{% endif %}
+                    </div>
                 </div>
             </div>
-            <span class="badge {% if sala in salas_ocupadas_agora %}busy{% else %}available{% endif %}">
-                {% if sala in salas_ocupadas_agora %}Ocupada{% else %}Disponível{% endif %}
-            </span>
+            <div class="room-side">
+                <span class="badge {{ 'busy' if st.ocupada else 'available' }}">{{ 'Ocupada' if st.ocupada else
+                    'Disponível' }}</span>
+                {% if not st.ocupada %}<a class="room-quick"
+                    href="{{ url_for('views.reservar', sala=s.nome, dia=hoje, inicio=hora) }}">Reservar {{ ico('arrow',
+                    13) }}</a>{% endif %}
+            </div>
         </div>
         {% endfor %}
-
-        <div style="margin-top:24px;">
-            <div class="panel-title">Ocupação Hoje</div>
-            {% for sala, perc in ocupacao.items() %}
-            <div class="usage-bar-wrap">
-                <div class="usage-bar-label">
-                    <span>{{ sala }}</span>
-                    <span style="color: {% if perc < 50 %}var(--success){% elif perc < 80 %}var(--orange){% else %}var(--primary){% endif %};">{{ perc }}%</span>
-                </div>
-                <div class="usage-bar">
-                    <div class="usage-fill" style="width:{{ perc }}%; background: {% if perc < 50 %}var(--success){% elif perc < 80 %}var(--orange){% else %}var(--primary){% endif %};"></div>
-                </div>
-            </div>
-            {% endfor %}
-        </div>
     </div>
 
-    <!-- Agenda do dia -->
-    <div class="panel">
-        <div class="panel-title">Resumo de Atividades</div>
-        {% if atividades %}
-            {% for a in atividades[:4] %}
+    <div>
+        <div class="panel" style="margin-bottom: 20px;">
+            <div class="panel-title">Agenda de hoje</div>
+            {% if agenda_hoje %}
+            {% for a in agenda_hoje %}
             <div class="schedule-row">
                 <div class="schedule-time">{{ a.inicio }} – {{ a.fim }}</div>
-                <div class="schedule-card {% if loop.index is even %}pink{% else %}blue{% endif %}">
-                    <div class="schedule-event">{{ a.sala }}</div>
-                    <div class="schedule-meta">{{ a.dia }}</div>
+                <div class="schedule-card {{ 'blue' if a.email == session.user_email else '' }}">
+                    <div class="schedule-event">{{ a.titulo or 'Reserva' }}</div>
+                    <div class="schedule-meta">{{ a.sala }} · {{ a.nome }}</div>
                 </div>
             </div>
             {% endfor %}
-        {% else %}
-            <div style="text-align: center; padding: 40px 0; color: var(--text-muted); font-size: 13px;">
-                Sem compromissos agendados.
+            <a href="{{ url_for('views.agenda') }}" class="ver-tudo ver-tudo-block">Ver linha do tempo completa →</a>
+            {% else %}
+            <div class="empty-state compact">
+                <div class="empty-state-title">Nada mais agendado para hoje</div>
+                <div class="empty-state-sub">Todos os espaços estão livres até o fim do dia.</div>
             </div>
-        {% endif %}
+            {% endif %}
+        </div>
+
+        <div class="panel">
+            <div class="panel-title">Ocupação hoje · por espaço</div>
+            {% for s in salas %}
+            {% set perc = ocupacao[s.nome] %}
+            {% set cor = 'var(--success)' if perc < 50 else ('var(--orange)' if perc < 80 else 'var(--primary)' ) %}
+                <div class="usage-bar-wrap">
+                <div class="usage-bar-label"><span>{{ s.nome }}</span><span style="color: {{ cor }};">{{ perc }}%</span>
+                </div>
+                <div class="usage-bar">
+                    <div class="usage-fill" style="width:{{ perc }}%; background: {{ cor }};"></div>
+                </div>
+        </div>
+        {% endfor %}
     </div>
 </div>
-
-<!-- Últimas atividades -->
-<div class="panel">
-    <div class="section-header" style="margin-bottom:14px; margin-top: 0;">
-        <div class="section-title">Suas Últimas Reservas</div>
-        <a href="{{ url_for('views.reservas_view') }}" class="ver-tudo">Ver tudo →</a>
-    </div>
-    {% if atividades %}
-        <table style="width: 100%;">
-            <thead>
-                <tr>
-                    <th style="padding: 10px 0;">SALA</th>
-                    <th style="padding: 10px 0;">DIA</th>
-                    <th style="padding: 10px 0;">HORÁRIO</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for a in atividades[:3] %}
-                <tr>
-                    <td style="padding: 12px 0; font-weight: 500;">{{ a.sala }}</td>
-                    <td style="padding: 12px 0;">{{ a.dia }}</td>
-                    <td style="padding: 12px 0; color: var(--primary);">{{ a.inicio }} - {{ a.fim }}</td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    {% endif %}
 </div>
 {% endblock %}

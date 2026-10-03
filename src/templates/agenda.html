@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+{% from "_icons.html" import ico %}
+{% from "_components.html" import header, data_br %}
+{% block title %}Agenda do dia{% endblock %}
+{% block content %}
+{% call header("Agenda do dia", "Linha do tempo de todos os espaços. Clique em um horário livre para reservar com tudo
+preenchido.") %}
+<a class="btn btn-secondary btn-icon" href="{{ url_for('views.agenda', dia=anterior) }}" aria-label="Dia anterior">{{
+    ico('left', 16) }}</a>
+<form method="GET" action="{{ url_for('views.agenda') }}" class="inline-form">
+    <input type="date" name="dia" value="{{ dia }}" onchange="this.form.submit()" aria-label="Escolher dia">
+</form>
+<a class="btn btn-secondary btn-icon" href="{{ url_for('views.agenda', dia=proximo) }}" aria-label="Próximo dia">{{
+    ico('right', 16) }}</a>
+{% if dia != hoje %}<a class="btn btn-secondary" href="{{ url_for('views.agenda') }}">Hoje</a>{% endif %}
+{% endcall %}
+
+<div class="panel timeline-panel">
+    <div class="tl-legend">
+        <span><i class="lg lg-meu"></i>Minhas reservas</span>
+        <span><i class="lg lg-outro"></i>Outros usuários</span>
+        <span><i class="lg lg-agora"></i>Agora</span>
+    </div>
+    <div class="tl-scroll">
+        <div class="tl">
+            <div class="tl-row tl-head">
+                <div class="tl-name"></div>
+                <div class="tl-track tl-hours" style="--n: {{ n_horas }};">
+                    {% for h in horas[:-1] %}<span>{{ '%02d' % h }}h</span>{% endfor %}
+                </div>
+            </div>
+            {% for l in linhas %}
+            <div class="tl-row">
+                <div class="tl-name"><strong>{{ l.sala.nome }}</strong><small>{{ l.sala.unidade }} · {{
+                        l.sala.capacidade }} pessoas</small></div>
+                <div class="tl-track" style="--n: {{ n_horas }};">
+                    {% if agora_pct is not none %}<div class="tl-now" style="left: {{ agora_pct }}%;"></div>{% endif %}
+                    {% for b in l.blocos %}
+                    <div class="tl-block {{ 'meu' if b.meu else '' }}" style="left: {{ b.esq }}%; width: {{ b.larg }}%;"
+                        title="{{ b.titulo or 'Reserva' }} · {{ b.inicio }}–{{ b.fim }} · {{ b.nome }}">
+                        <span class="tl-block-title">{{ b.titulo or 'Reserva' }}</span>
+                        <span class="tl-block-meta">{{ b.inicio }}–{{ b.fim }}</span>
+                    </div>
+                    {% endfor %}
+                    {% if dia >= hoje %}
+                    <a class="tl-add" href="{{ url_for('views.reservar', sala=l.sala.nome, dia=dia) }}"
+                        title="Reservar {{ l.sala.nome }}">{{ ico('plus', 14) }}</a>
+                    {% endif %}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}

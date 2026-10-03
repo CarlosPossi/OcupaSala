@@ -1,44 +1,88 @@
 {% extends "base.html" %}
+{% from "_icons.html" import ico %}
+{% from "_components.html" import header %}
+{% block title %}Relatórios{% endblock %}
 {% block content %}
-<div class="page-title">Relatórios e Estatísticas</div>
-<div class="page-sub">Análise detalhada do uso das salas de estudo.</div>
+{{ header("Relatórios e estatísticas", "Métricas calculadas a partir das reservas reais do sistema.") }}
 
 <div class="cards-grid">
     <div class="card">
-        <div class="card-label">Total Histórico</div>
-        <div class="card-value blue">{{ total }}</div>
-        <div class="card-sub">Reservas desde o início</div>
+        <div class="card-label">Total de reservas</div>
+        <div class="card-value blue">{{ e.total }}</div>
+        <div class="card-sub">{{ e.horas_total }} h reservadas no total</div>
     </div>
     <div class="card">
-        <div class="card-label">Média Semanal</div>
-        <div class="card-value pink">~8</div>
-        <div class="card-sub">Reservas por semana</div>
+        <div class="card-label">Esta semana</div>
+        <div class="card-value pink">{{ e.semana }}</div>
+        <div class="card-sub">Reservas de segunda a domingo</div>
     </div>
     <div class="card">
-        <div class="card-label">Pico de Horário</div>
-        <div class="card-value green">14:30</div>
-        <div class="card-sub">Horário mais concorrido</div>
+        <div class="card-label">Horário de pico</div>
+        <div class="card-value green">{{ e.pico }}</div>
+        <div class="card-sub">Hora mais concorrida</div>
     </div>
     <div class="card">
-        <div class="card-label">Economia de Tempo</div>
-        <div class="card-value">12h</div>
-        <div class="card-sub">Estimativa de agilidade</div>
+        <div class="card-label">Espaço mais usado</div>
+        <div class="card-value card-value-sm">{{ e.mais_usado }}</div>
+        <div class="card-sub">Em horas reservadas</div>
     </div>
 </div>
 
-<div class="panel">
-    <div class="panel-title">Uso por Sala (Histórico)</div>
-    <div class="usage-bar-wrap">
-        <div class="usage-bar-label"><span>Sala 1</span><span>45%</span></div>
-        <div class="usage-bar"><div class="usage-fill" style="width:45%; background: var(--success);"></div></div>
+<div class="two-col">
+    <div class="panel">
+        <div class="panel-title">Reservas por horário do dia</div>
+        <div class="hist">
+            {% for h, n in e.por_hora.items() %}
+            <div class="hist-col" title="{{ n }} reserva(s) às {{ '%02d' % h }}h">
+                <div class="hist-bar-wrap">
+                    <div class="hist-bar {{ 'peak' if n == e.max_hora and n > 0 }}"
+                        style="height: {{ (n / e.max_hora * 100)|int }}%;"></div>
+                </div>
+                <span>{{ '%02d' % h }}</span>
+            </div>
+            {% endfor %}
+        </div>
     </div>
-    <div class="usage-bar-wrap">
-        <div class="usage-bar-label"><span>Sala 2</span><span>72%</span></div>
-        <div class="usage-bar"><div class="usage-fill" style="width:72%; background: var(--primary);"></div></div>
+    <div class="panel">
+        <div class="panel-title">Horas reservadas por espaço</div>
+        {% for nome, h in e.ranking %}
+        <div class="usage-bar-wrap">
+            <div class="usage-bar-label"><span>{{ nome }}</span><span>{{ h|round(1) }} h</span></div>
+            <div class="usage-bar">
+                <div class="usage-fill" style="width: {{ (h / e.max_sala * 100)|int }}%; background: var(--primary);">
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+        {% if e.ociosos %}<p class="form-hint">{{ ico('sparkle', 13) }} Sem nenhuma reserva ainda: {{ e.ociosos|join(',
+            ') }}.</p>{% endif %}
     </div>
-    <div class="usage-bar-wrap">
-        <div class="usage-bar-label"><span>Sala 3</span><span>30%</span></div>
-        <div class="usage-bar"><div class="usage-fill" style="width:30%; background: var(--blue);"></div></div>
+</div>
+
+<div class="two-col">
+    <div class="panel">
+        <div class="panel-title">Horas por unidade / organização</div>
+        {% for un, h in e.por_unidade %}
+        <div class="usage-bar-wrap">
+            <div class="usage-bar-label"><span>{{ un }}</span><span>{{ h|round(1) }} h</span></div>
+            <div class="usage-bar">
+                <div class="usage-fill"
+                    style="width: {{ (h / e.max_unidade * 100)|int }}%; background: var(--success);"></div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    <div class="panel">
+        <div class="panel-title">Quem mais reserva</div>
+        {% for nome, n in e.top_pessoas %}
+        <div class="room-item">
+            <div class="who"><span class="mini-avatar">{{ nome[0] }}</span><span>{{ nome }}</span></div><span
+                class="badge available">{{ n }} reserva(s)</span>
+        </div>
+        {% else %}<div class="empty-state compact">
+            <div class="empty-state-title">Sem dados ainda</div>
+        </div>
+        {% endfor %}
     </div>
 </div>
 {% endblock %}

@@ -1,56 +1,78 @@
+{% from "_icons.html" import ico %}
 <!DOCTYPE html>
 <html lang="pt-BR">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>OcupaSala | Reserva de Salas FIAP</title>
+    <title>{% block title %}OcupaSala{% endblock %} | Reserva de Espaços</title>
     <link rel="icon" type="image/png" href="{{ url_for('static', filename='img/favicon.png') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 
 <body>
     {% if session.get('user_email') %}
+    {% set ep = request.endpoint %}
+    <div class="topbar">
+        <button class="topbar-btn" type="button" onclick="document.body.classList.toggle('nav-open')"
+            aria-label="Menu">{{ ico('menu', 22) }}</button>
+        <a href="{{ url_for('views.dashboard') }}" class="brand">
+            <div class="brand-icon"><img src="{{ url_for('static', filename='img/logo-icon.png') }}" alt=""></div>
+            <span class="brand-name">OcupaSala</span>
+        </a>
+    </div>
+    <div class="nav-backdrop" onclick="document.body.classList.remove('nav-open')"></div>
     <div class="dash">
         <aside class="sidebar">
             <a href="{{ url_for('views.dashboard') }}" class="brand">
-                <div class="brand-icon">
-                    <img src="{{ url_for('static', filename='img/logo-icon.png') }}" alt="OcupaSala">
-                </div>
+                <div class="brand-icon"><img src="{{ url_for('static', filename='img/logo-icon.png') }}"
+                        alt="OcupaSala"></div>
                 <span class="brand-name">OcupaSala</span>
             </a>
 
-            <nav style="flex: 1;">
-                <a href="{{ url_for('views.dashboard') }}"
-                    class="nav-item {% if request.endpoint == 'views.dashboard' %}active{% endif %}">Dashboard</a>
-                <a href="{{ url_for('views.reservar') }}"
-                    class="nav-item {% if request.endpoint == 'views.reservar' %}active{% endif %}">Reservar Sala</a>
+            <nav>
+                <div class="nav-group">Espaços</div>
+                <a href="{{ url_for('views.dashboard') }}" class="nav-item {{ 'active' if ep == 'views.dashboard' }}">{{
+                    ico('dashboard') }}Dashboard</a>
+                <a href="{{ url_for('views.agenda') }}" class="nav-item {{ 'active' if ep == 'views.agenda' }}">{{
+                    ico('timeline') }}Agenda do dia</a>
+                <a href="{{ url_for('views.disponibilidade') }}"
+                    class="nav-item {{ 'active' if ep == 'views.disponibilidade' }}">{{ ico('search') }}Buscar espaço
+                    livre</a>
+
+                <div class="nav-group">Reservas</div>
+                <a href="{{ url_for('views.reservar') }}" class="nav-item {{ 'active' if ep == 'views.reservar' }}">{{
+                    ico('plus') }}Reservar espaço</a>
                 <a href="{{ url_for('views.reservas_view') }}"
-                    class="nav-item {% if request.endpoint == 'views.reservas_view' %}active{% endif %}">Quadro de
-                    Reservas</a>
+                    class="nav-item {{ 'active' if ep == 'views.reservas_view' }}">{{ ico('list') }}Quadro de
+                    reservas</a>
+
+                <div class="nav-group">Gestão</div>
+                <a href="{{ url_for('views.espacos') }}"
+                    class="nav-item {{ 'active' if ep in ['views.espacos', 'views.excluir_espaco'] }}">{{ ico('door')
+                    }}Gerenciar espaços</a>
                 <a href="{{ url_for('views.relatorios') }}"
-                    class="nav-item {% if request.endpoint == 'views.relatorios' %}active{% endif %}"
-                    style="margin-top:8px;">Relatórios</a>
+                    class="nav-item {{ 'active' if ep == 'views.relatorios' }}">{{ ico('chart') }}Relatórios</a>
                 <a href="{{ url_for('views.configuracoes') }}"
-                    class="nav-item {% if request.endpoint == 'views.configuracoes' %}active{% endif %}">Configurações</a>
+                    class="nav-item {{ 'active' if ep == 'views.configuracoes' }}">{{ ico('settings')
+                    }}Configurações</a>
             </nav>
 
             <div class="user-section">
-                <div class="user-name">{{ session.get('user_nome') }}</div>
-                <div class="user-role">Aluno FIAP</div>
-                <a href="{{ url_for('auth.logout') }}"
-                    style="color: var(--primary); font-size: 10px; text-decoration: none; display: block; margin-top: 8px; font-weight: 600;">SAIR
-                    DO SISTEMA</a>
+                <div class="user-avatar">{{ iniciais }}</div>
+                <div class="user-meta">
+                    <div class="user-name">{{ session.get('user_nome') }}</div>
+                    <a href="{{ url_for('auth.logout') }}" class="user-logout">{{ ico('logout', 13) }}Sair do
+                        sistema</a>
+                </div>
             </div>
         </aside>
 
         <main class="main">
             {% with messages = get_flashed_messages(with_categories=true) %}
-            {% if messages %}
             {% for category, message in messages %}
-            <div class="alert {{ category }}">{{ message }}</div>
+            <div class="alert {{ category }}" role="status">{{ message }}</div>
             {% endfor %}
-            {% endif %}
             {% endwith %}
 
             {% block content %}{% endblock %}
@@ -58,19 +80,57 @@
     </div>
     {% else %}
     <div class="auth-wrapper">
-        <div style="width: 100%; max-width: 420px; padding: 0 20px;">
-            {% with messages = get_flashed_messages(with_categories=true) %}
-            {% if messages %}
-            {% for category, message in messages %}
-            <div class="alert {{ category }}">{{ message }}</div>
-            {% endfor %}
-            {% endif %}
-            {% endwith %}
+        <div class="auth-showcase">
+            <div class="showcase-brand">
+                <img src="{{ url_for('static', filename='img/logo-icon.png') }}" alt="OcupaSala">
+                <span>OcupaSala</span>
+            </div>
+            <h1 class="showcase-title">O espaço certo, no horário certo — para qualquer time.</h1>
+            <p class="showcase-sub">Salas de aula, laboratórios, salas de reunião ou estações de trabalho: um único
+                painel para escolas, faculdades e escritórios reservarem espaços sem conflito de horário.</p>
+            <ul class="showcase-points">
+                <li><span class="point-dot"></span> Ocupação em tempo real, por espaço</li>
+                <li><span class="point-dot"></span> Sugestões automáticas quando há conflito</li>
+                <li><span class="point-dot"></span> Reservas recorrentes e exportação para sua agenda</li>
+                <li><span class="point-dot"></span> Catálogo de espaços que sua equipe edita, sem TI</li>
+            </ul>
+            <div class="showcase-strip">
+                <div>
+                    <div class="showcase-stat-value">3</div>
+                    <div class="showcase-stat-label">tipos de organização atendidos</div>
+                </div>
+                <div>
+                    <div class="showcase-stat-value">0</div>
+                    <div class="showcase-stat-label">conflitos de horário permitidos</div>
+                </div>
+                <div>
+                    <div class="showcase-stat-value">&lt; 1min</div>
+                    <div class="showcase-stat-label">para reservar um espaço</div>
+                </div>
+            </div>
+        </div>
+        <div class="auth-panel">
+            <div class="auth-panel-inner">
+                <div class="auth-logo">
+                    <img src="{{ url_for('static', filename='img/logo-full.png') }}" alt="OcupaSala">
+                </div>
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                {% for category, message in messages %}
+                <div class="alert {{ category }}" role="status">{{ message }}</div>
+                {% endfor %}
+                {% endwith %}
 
-            {% block auth_content %}{% endblock %}
+                {% block auth_content %}{% endblock %}
+            </div>
         </div>
     </div>
     {% endif %}
+    <script>
+        // Alertas somem sozinhos; fecham o menu mobile ao navegar
+        document.querySelectorAll('.alert').forEach(function (a) {
+            setTimeout(function () { a.classList.add('alert-hide'); }, 6000);
+        });
+    </script>
 </body>
 
 </html>

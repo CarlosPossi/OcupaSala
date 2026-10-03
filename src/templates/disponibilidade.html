@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+{% from "_icons.html" import ico %}
+{% from "_components.html" import tags, header, data_br %}
+{% block title %}Buscar espaço livre{% endblock %}
+{% block content %}
+{{ header("Buscar espaço livre", "Diga quando e para quantas pessoas — o OcupaSala mostra só o que está realmente
+disponível, do melhor encaixe ao maior.") }}
+
+<div class="panel form-panel wide">
+    <form method="GET" action="{{ url_for('views.disponibilidade') }}">
+        <input type="hidden" name="buscar" value="1">
+        <div class="form-row">
+            <div class="form-group"><label for="dia">Dia</label>
+                <input id="dia" type="date" name="dia" required min="{{ hoje }}" value="{{ f.dia }}">
+            </div>
+            <div class="form-group"><label for="inicio">Início</label>
+                <input id="inicio" type="time" name="inicio" required min="07:00" max="22:00" step="900"
+                    value="{{ f.inicio }}">
+            </div>
+            <div class="form-group"><label for="fim">Término</label>
+                <input id="fim" type="time" name="fim" required min="07:00" max="22:00" step="900" value="{{ f.fim }}">
+            </div>
+            <div class="form-group"><label for="minimo">Pessoas (mín.)</label>
+                <input id="minimo" type="number" name="minimo" min="1" value="{{ f.minimo or 1 }}">
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="form-group"><label for="tipo">Tipo</label>
+                <select id="tipo" name="tipo">
+                    <option value="">Qualquer tipo</option>
+                    {% for t in tipos %}<option {{ 'selected' if f.tipo==t }}>{{ t }}</option>{% endfor %}
+                </select>
+            </div>
+            <div class="form-group"><label for="unidade">Unidade</label>
+                <select id="unidade" name="unidade">
+                    <option value="">Qualquer unidade</option>
+                    {% for u in unidades %}<option {{ 'selected' if f.unidade==u }}>{{ u }}</option>{% endfor %}
+                </select>
+            </div>
+        </div>
+        <button type="submit" class="btn btn-primary">{{ ico('search', 16) }}Buscar</button>
+    </form>
+</div>
+
+{% if resultado is not none %}
+<div class="section-header">
+    <div class="section-title">{{ resultado|length }} espaço(s) livre(s) em {{ data_br(f.dia) }}, {{ f.inicio }}–{{
+        f.fim }}</div>
+</div>
+{% if resultado %}
+<div class="spaces-grid">
+    {% for s in resultado %}
+    <div class="space-card">
+        <div class="space-name">{{ s.nome }}</div>
+        <div class="space-tags">{{ tags(s) }}</div>
+        <div class="space-cap">{{ ico('users', 14) }} Comporta até {{ s.capacidade }} pessoas</div>
+        <a class="btn btn-primary btn-sm"
+            href="{{ url_for('views.reservar', sala=s.nome, dia=f.dia, inicio=f.inicio, fim=f.fim, participantes=f.minimo or 1) }}">Reservar
+            este espaço</a>
+    </div>
+    {% endfor %}
+</div>
+{% else %}
+<div class="panel">
+    <div class="empty-state">
+        <div class="empty-state-icon">{{ ico('search', 28) }}</div>
+        <div class="empty-state-title">Nenhum espaço livre com esses critérios</div>
+        <div class="empty-state-sub">Tente outro horário, reduza o nº de pessoas ou remova os filtros.</div>
+    </div>
+</div>
+{% endif %}
+{% endif %}
+{% endblock %}

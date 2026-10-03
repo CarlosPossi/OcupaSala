@@ -1,32 +1,54 @@
-import os
+"""Utilitários de persistência (JSON em disco) e configuração básica."""
 import json
+import os
+import secrets
+import tempfile
+from datetime import datetime
+from zoneinfo import ZoneInfo
 
-# Caminhos dos arquivos de dados
-# O BASE_DIR agora é resolvido a partir de models/utils.py
-# Subindo um nível (..) para chegar em src/ e depois em data/
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-DATA_DIR = os.path.join(BASE_DIR, "data")
+DATA_DIR = os.environ.get("OCUPASALA_DATA_DIR", os.path.join(BASE_DIR, "data"))
 USERS_FILE = os.path.join(DATA_DIR, "users.json")
 RESERVAS_FILE = os.path.join(DATA_DIR, "reservas.json")
+SALAS_FILE = os.path.join(DATA_DIR, "salas.json")
+SECRET_FILE = os.path.join(DATA_DIR, ".secret_key")
 
-# Garante que a pasta data exista
+# Fuso usado para "agora" / "hoje". Pode ser trocado via variável de ambiente.
+TZ = ZoneInfo(os.environ.get("OCUPASALA_TZ", "America/Sao_Paulo"))
+
 os.makedirs(DATA_DIR, exist_ok=True)
 
-# Inicializa arquivos se não existirem
-if not os.path.exists(USERS_FILE):
-    with open(USERS_FILE, 'w') as f:
-        json.dump([], f)
-if not os.path.exists(RESERVAS_FILE):
-    with open(RESERVAS_FILE, 'w') as f:
-        json.dump([], f)
+
+def agora():
+    return datetime.now(TZ)
+
 
 def load_json(filepath):
     try:
-        with open(filepath, 'r') as f:
+        with open(filepath, "r", encoding="utf-8") as f:
             return json.load(f)
-    except:
+    except (OSError, ValueError):
         return []
 
+
 def save_json(filepath, data):
-    with open(filepath, 'w') as f:
-        json.dump(data, f, indent=4)
+    """Grava de forma atômica (arquivo temporário + rename) para não corromper o JSON."""
+    fd, tmp = tempfile.mkstemp(dir=DATA_DIR, suffix=".tmp")
+    with os.fdopen(fd, "w", encoding="utf-8") as f:
+        json.dump(data, f, indent=2, ensure_ascii=False)
+    os.replace(tmp, filepath)
+
+
+def get_secret_key():
+    """Chave de sessão: variável SECRET_KEY, ou uma chave aleatória persistida em data/."""
+    env = os.environ.get("SECRET_KEY")
+    if env:
+        return env
+    try:
+        with open(SECRET_FILE, "r") as f:
+            return f.read().strip()
+    except OSError:
+        key = secrets.token_hex(32)
+        with open(SECRET_FILE, "w") as f:
+            f.write(key)
+        return key
