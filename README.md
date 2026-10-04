@@ -152,6 +152,7 @@ OcupaSala/
 
 *  **Miro:** https://miro.com/app/board/uXjVHsCVu7Q=/
 
+*  **Trello:** https://trello.com/b/SkjPq5Ac/checkpoint-5
 ---
 
 ## 👥 Autores
