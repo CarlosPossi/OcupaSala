@@ -148,6 +148,12 @@ OcupaSala/
 
 ---
 
+## 🔗 Links
+
+*  **Miro:** https://miro.com/app/board/uXjVHsCVu7Q=/
+
+---
+
 ## 👥 Autores
 
 * Fabio Henrique Santos Farias
